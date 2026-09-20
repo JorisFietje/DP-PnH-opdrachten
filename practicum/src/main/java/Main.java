@@ -1,6 +1,9 @@
+import domain.Adres;
 import domain.Reiziger;
 import globals.Hibernate;
+import infra.dao.IAdresDao;
 import infra.dao.IReizigerDao;
+import infra.hibernate.AdresDaoHibernate;
 import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -13,8 +16,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * P2H - Persistentie van een klasse met Hibernate.
- * Test elke CRUD-operatie van ReizigerDAOHibernate op de tabel reiziger.
+ * P2H en P3H - Persistentie met Hibernate.
+ * Test de CRUD-operaties van ReizigerDAOHibernate en AdresDAOHibernate.
  */
 public class Main {
 
@@ -25,7 +28,11 @@ public class Main {
             emf = Persistence.createEntityManagerFactory(Hibernate.persistanceUnitName);
             entityManager = emf.createEntityManager();
 
-            testReizigerDAOHibernate(new ReizigerDaoHibernate(entityManager), entityManager);
+            IReizigerDao rdao = new ReizigerDaoHibernate(entityManager);
+            IAdresDao adao = new AdresDaoHibernate(entityManager);
+
+            testReizigerDAOHibernate(rdao, entityManager);
+            testAdresDAO(adao, rdao, entityManager);
         } catch (PersistenceException e) {
             System.err.println("Hibernate kon de bewerking niet uitvoeren: " + e.getMessage());
         } catch (SQLException e) {
@@ -104,5 +111,55 @@ public class Main {
         boolean verwijderd = inTransactie(em, () -> rdao.delete(sietske));
         reizigers = rdao.findAll();
         System.out.println(reizigers.size() + " reizigers (delete gaf " + verwijderd + " terug)\n");
+    }
+
+    /**
+     * P3H - Test de CRUD-operaties van AdresDAO.
+     */
+    private static void testAdresDAO(IAdresDao adao, IReizigerDao rdao, EntityManager em) throws SQLException {
+        System.out.println("\n---------- Test AdresDAO (Hibernate) -------------");
+
+        // Haal alle adressen op uit de database
+        List<Adres> adressen = adao.findAll();
+        System.out.println("[Test] AdresDAO.findAll() geeft de volgende adressen:");
+        for (Adres a : adressen) {
+            System.out.println(a);
+        }
+        System.out.println();
+
+        // Persisteer een nieuw adres.
+        Reiziger albrechts = rdao.findById(6);
+        Adres nieuwAdres = new Adres(101, "1234AB", "12", "Teststraat", "Utrecht");
+        nieuwAdres.setReiziger(albrechts);
+        albrechts.setAdres(nieuwAdres);
+
+        System.out.print("[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.save() ");
+        boolean opgeslagen = inTransactie(em, () -> adao.save(nieuwAdres));
+        adressen = adao.findAll();
+        System.out.println(adressen.size() + " adressen (save gaf " + opgeslagen + " terug)\n");
+
+        // Haal het zojuist opgeslagen adres op via zijn id
+        System.out.println("[Test] AdresDAO.findById(101) geeft: " + adao.findById(101) + "\n");
+
+        // Wijzig het adres en persisteer de wijziging
+        nieuwAdres.setStraat("Arnhemseweg");
+        nieuwAdres.setWoonplaats("Amersfoort");
+        nieuwAdres.setPostcode("3817CH");
+        boolean gewijzigd = inTransactie(em, () -> adao.update(nieuwAdres));
+        System.out.println("[Test] AdresDAO.update() (gaf " + gewijzigd + " terug) geeft findById(101): "
+                + adao.findById(101) + "\n");
+
+        // Zoek het adres op via de reiziger die eraan hangt
+        System.out.println("[Test] AdresDAO.findByReiziger(" + albrechts.getNaam() + ") geeft: "
+                + adao.findByReiziger(albrechts) + "\n");
+
+        // Verwijder het adres weer.
+        System.out.print("[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.delete() ");
+        boolean adresVerwijderd = inTransactie(em, () -> {
+            albrechts.setAdres(null);
+            return adao.delete(nieuwAdres);
+        });
+        adressen = adao.findAll();
+        System.out.println(adressen.size() + " adressen (delete gaf " + adresVerwijderd + " terug)\n");
     }
 }

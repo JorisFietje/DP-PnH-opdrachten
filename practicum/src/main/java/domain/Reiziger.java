@@ -26,7 +26,10 @@ public class Reiziger {
     @Column(name = "geboortedatum")
     private Date geboortedatum;
 
-    @Transient
+    @OneToOne(mappedBy = "reiziger",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true)
     private Adres adres;
 
     @Transient
@@ -109,7 +112,7 @@ public class Reiziger {
 
     @Override
     public String toString() {
-        return String.format("Reiziger [id=%d, naam=%s, geboortedatum=%s]",
-                reizigerId, getNaam(), geboortedatum);
+        return String.format("Reiziger {#%d %s, geb. %s, %s}",
+                reizigerId, getNaam(), geboortedatum, adres);
     }
 }
