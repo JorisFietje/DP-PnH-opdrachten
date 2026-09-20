@@ -3,7 +3,7 @@ package p2SingularObjectTests;
 import infra.dao.IReizigerDao;
 import domain.Reiziger;
 import globals.Hibernate;
-import infra.hibernate.ReizigerHibernate;
+import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -39,7 +39,7 @@ public class p2hTestReizigerDao {
         entityManager = emf.createEntityManager();
         entityManager.getTransaction().begin();
 
-        reizigerDao = new ReizigerHibernate(entityManager);
+        reizigerDao = new ReizigerDaoHibernate(entityManager);
     }
 
     @AfterEach

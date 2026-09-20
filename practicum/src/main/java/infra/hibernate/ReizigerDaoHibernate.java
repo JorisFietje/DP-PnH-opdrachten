@@ -7,27 +7,30 @@ import jakarta.persistence.EntityManager;
 import java.sql.Date;
 import java.util.List;
 
-public class ReizigerHibernate implements IReizigerDao {
+public class ReizigerDaoHibernate implements IReizigerDao {
 
     private final EntityManager entityManager;
 
-    public ReizigerHibernate(EntityManager entityManager) {
+    public ReizigerDaoHibernate(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
-    public void save(Reiziger reiziger) {
+    public boolean save(Reiziger reiziger) {
         entityManager.persist(reiziger);
+        return true;
     }
 
     @Override
-    public void update(Reiziger reiziger) {
+    public boolean update(Reiziger reiziger) {
         entityManager.merge(reiziger);
+        return true;
     }
 
     @Override
-    public void delete(Reiziger reiziger) {
+    public boolean delete(Reiziger reiziger) {
         entityManager.remove(reiziger);
+        return true;
     }
 
     @Override

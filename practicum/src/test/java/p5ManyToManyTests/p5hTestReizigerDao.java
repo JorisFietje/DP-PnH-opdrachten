@@ -5,7 +5,7 @@ import infra.dao.*;
 import globals.Hibernate;
 import infra.hibernate.OvChipkaartDaoHibernate;
 import infra.hibernate.ProductDaoHibernate;
-import infra.hibernate.ReizigerHibernate;
+import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -50,7 +50,7 @@ public class p5hTestReizigerDao {
 
         ovChipkaartDao = new OvChipkaartDaoHibernate(entityManager);
         productDao = new ProductDaoHibernate(entityManager);
-        reizigerDao = new ReizigerHibernate(entityManager);
+        reizigerDao = new ReizigerDaoHibernate(entityManager);
     }
 
     @AfterEach

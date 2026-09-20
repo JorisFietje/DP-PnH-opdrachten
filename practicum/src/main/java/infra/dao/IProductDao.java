@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IProductDao {
-    void save(Product product) throws SQLException;
+    boolean save(Product product) throws SQLException;
 
-    void update(Product product) throws SQLException;
+    boolean update(Product product) throws SQLException;
 
-    void delete(Product product) throws SQLException;
+    boolean delete(Product product) throws SQLException;
 
     Product findById(int id) throws SQLException;
 

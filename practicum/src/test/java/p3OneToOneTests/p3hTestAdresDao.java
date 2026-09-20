@@ -5,8 +5,8 @@ import infra.dao.IAdresDao;
 import infra.dao.IReizigerDao;
 import domain.Reiziger;
 import globals.Hibernate;
-import infra.hibernate.AdresHibernate;
-import infra.hibernate.ReizigerHibernate;
+import infra.hibernate.AdresDaoHibernate;
+import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -41,8 +41,8 @@ public class p3hTestAdresDao {
         entityManager = emf.createEntityManager();
         entityManager.getTransaction().begin();
 
-        adresDao = new AdresHibernate(entityManager);
-        reizigerDao = new ReizigerHibernate(entityManager);
+        adresDao = new AdresDaoHibernate(entityManager);
+        reizigerDao = new ReizigerDaoHibernate(entityManager);
     }
 
     @AfterEach

@@ -8,22 +8,25 @@ import jakarta.persistence.EntityManager;
 import java.sql.SQLException;
 import java.util.List;
 
-public class AdresHibernate implements IAdresDao {
+public class AdresDaoHibernate implements IAdresDao {
 
-    public AdresHibernate(EntityManager entityManager) {
+    public AdresDaoHibernate(EntityManager entityManager) {
 
     }
 
     @Override
-    public void save(Adres adres) throws SQLException {
+    public boolean save(Adres adres) throws SQLException {
+        return false;
     }
 
     @Override
-    public void update(Adres adres) throws SQLException {
+    public boolean update(Adres adres) throws SQLException {
+        return false;
     }
 
     @Override
-    public void delete(Adres adres) throws SQLException {
+    public boolean delete(Adres adres) throws SQLException {
+        return false;
     }
 
     @Override

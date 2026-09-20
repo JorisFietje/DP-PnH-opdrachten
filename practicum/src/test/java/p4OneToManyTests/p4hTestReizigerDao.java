@@ -3,9 +3,9 @@ package p4OneToManyTests;
 import domain.*;
 import infra.dao.*;
 import globals.Hibernate;
-import infra.hibernate.AdresHibernate;
+import infra.hibernate.AdresDaoHibernate;
 import infra.hibernate.OvChipkaartDaoHibernate;
-import infra.hibernate.ReizigerHibernate;
+import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -48,8 +48,8 @@ public class p4hTestReizigerDao {
         entityManager = emf.createEntityManager();
         entityManager.getTransaction().begin();
 
-        adresDao = new AdresHibernate(entityManager);
-        reizigerDao = new ReizigerHibernate(entityManager);
+        adresDao = new AdresDaoHibernate(entityManager);
+        reizigerDao = new ReizigerDaoHibernate(entityManager);
         ovChipkaartDao = new OvChipkaartDaoHibernate(entityManager);
     }
 

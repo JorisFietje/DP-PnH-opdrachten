@@ -4,7 +4,7 @@ import domain.*;
 import infra.dao.*;
 import globals.Hibernate;
 import infra.hibernate.OvChipkaartDaoHibernate;
-import infra.hibernate.ReizigerHibernate;
+import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -42,7 +42,7 @@ public class p4hTestOvChipkaartDao {
         entityManager.getTransaction().begin();
 
         ovChipkaartDao = new OvChipkaartDaoHibernate(entityManager);
-        reizigerDao = new ReizigerHibernate(entityManager);
+        reizigerDao = new ReizigerDaoHibernate(entityManager);
     }
 
     @AfterEach
