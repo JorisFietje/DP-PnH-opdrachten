@@ -32,7 +32,10 @@ public class Reiziger {
             orphanRemoval = true)
     private Adres adres;
 
-    @Transient
+    @OneToMany(mappedBy = "reiziger",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<OvChipkaart> ovChipkaart = new ArrayList<>();
 
     public Reiziger() {

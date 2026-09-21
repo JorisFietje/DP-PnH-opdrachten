@@ -1,9 +1,12 @@
 import domain.Adres;
+import domain.OvChipkaart;
 import domain.Reiziger;
 import globals.Hibernate;
 import infra.dao.IAdresDao;
+import infra.dao.IOvChipkaartDao;
 import infra.dao.IReizigerDao;
 import infra.hibernate.AdresDaoHibernate;
+import infra.hibernate.OvChipkaartDaoHibernate;
 import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -11,13 +14,16 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceException;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
 /**
- * P2H en P3H - Persistentie met Hibernate.
- * Test de CRUD-operaties van ReizigerDAOHibernate en AdresDAOHibernate.
+ * P2H, P3H en P4H - Persistentie met Hibernate.
+ * Test de CRUD-operaties van ReizigerDAOHibernate, AdresDAOHibernate en
+ * OVChipkaartDAOHibernate.
  */
 public class Main {
 
@@ -30,9 +36,11 @@ public class Main {
 
             IReizigerDao rdao = new ReizigerDaoHibernate(entityManager);
             IAdresDao adao = new AdresDaoHibernate(entityManager);
+            IOvChipkaartDao odao = new OvChipkaartDaoHibernate(entityManager);
 
             testReizigerDAOHibernate(rdao, entityManager);
             testAdresDAO(adao, rdao, entityManager);
+            testOVChipkaartDAO(odao, rdao, entityManager);
         } catch (PersistenceException e) {
             System.err.println("Hibernate kon de bewerking niet uitvoeren: " + e.getMessage());
         } catch (SQLException e) {
@@ -161,5 +169,51 @@ public class Main {
         });
         adressen = adao.findAll();
         System.out.println(adressen.size() + " adressen (delete gaf " + adresVerwijderd + " terug)\n");
+    }
+
+    /**
+     * P4H - Test de CRUD-operaties van OVChipkaartDAO, inclusief findByReiziger().
+     */
+    private static void testOVChipkaartDAO(IOvChipkaartDao odao, IReizigerDao rdao, EntityManager em)
+            throws SQLException {
+        System.out.println("\n---------- Test OVChipkaartDAO (Hibernate) -------------");
+
+        List<OvChipkaart> kaarten = odao.findAll();
+        System.out.println("[Test] OVChipkaartDAO.findAll() geeft " + kaarten.size() + " kaarten, waarvan de eerste vijf:");
+        kaarten.stream().limit(5).forEach(System.out::println);
+        System.out.println();
+
+        // Reiziger 6 heeft nog geen kaart.
+        Reiziger albrechts = rdao.findById(6);
+        OvChipkaart nieuweKaart = new OvChipkaart(
+                99001, Date.valueOf("2027-01-31"), BigInteger.valueOf(2), new BigDecimal("15.00"));
+        nieuweKaart.setReiziger(albrechts);
+        albrechts.getOvChipkaart().add(nieuweKaart);
+
+        System.out.print("[Test] Eerst " + kaarten.size() + " kaarten, na OVChipkaartDAO.save() ");
+        boolean opgeslagen = inTransactie(em, () -> odao.save(nieuweKaart));
+        kaarten = odao.findAll();
+        System.out.println(kaarten.size() + " kaarten (save gaf " + opgeslagen + " terug)\n");
+
+        System.out.println("[Test] OVChipkaartDAO.findById(99001) geeft: " + odao.findById(99001) + "\n");
+
+        nieuweKaart.setSaldo(new BigDecimal("42.50"));
+        boolean gewijzigd = inTransactie(em, () -> odao.update(nieuweKaart));
+        System.out.println("[Test] Na OVChipkaartDAO.update() (gaf " + gewijzigd + " terug) geeft findById(99001): "
+                + odao.findById(99001) + "\n");
+
+        System.out.println("[Test] OVChipkaartDAO.findByReiziger(" + albrechts.getNaam() + ") geeft:");
+        for (OvChipkaart k : odao.findByReiziger(albrechts)) {
+            System.out.println(k);
+        }
+        System.out.println();
+
+        System.out.print("[Test] Eerst " + kaarten.size() + " kaarten, na OVChipkaartDAO.delete() ");
+        boolean verwijderd = inTransactie(em, () -> {
+            albrechts.getOvChipkaart().remove(nieuweKaart);
+            return odao.delete(nieuweKaart);
+        });
+        kaarten = odao.findAll();
+        System.out.println(kaarten.size() + " kaarten (delete gaf " + verwijderd + " terug)\n");
     }
 }
