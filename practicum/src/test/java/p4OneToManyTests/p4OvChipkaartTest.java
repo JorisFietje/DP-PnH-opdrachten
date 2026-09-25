@@ -4,8 +4,6 @@ import domain.OvChipkaart;
 import domain.Reiziger;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,17 +29,17 @@ public class p4OvChipkaartTest {
     @Test
     void testKlasse() {
         OvChipkaart ovChipkaart = new OvChipkaart();
-        ovChipkaart.setKlasse(BigInteger.TWO);
+        ovChipkaart.setKlasse(2);
 
-        assertEquals(BigInteger.TWO, ovChipkaart.getKlasse());
+        assertEquals(2, ovChipkaart.getKlasse());
     }
 
     @Test
     void testSaldo() {
         OvChipkaart ovChipkaart = new OvChipkaart();
-        ovChipkaart.setSaldo(new BigDecimal(5));
+        ovChipkaart.setSaldo(5.0);
 
-        assertEquals(new BigDecimal(5), ovChipkaart.getSaldo());
+        assertEquals(5.0, ovChipkaart.getSaldo());
     }
 
     @Test

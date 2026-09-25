@@ -1,12 +1,15 @@
 import domain.Adres;
 import domain.OvChipkaart;
+import domain.Product;
 import domain.Reiziger;
 import globals.Hibernate;
 import infra.dao.IAdresDao;
 import infra.dao.IOvChipkaartDao;
+import infra.dao.IProductDao;
 import infra.dao.IReizigerDao;
 import infra.hibernate.AdresDaoHibernate;
 import infra.hibernate.OvChipkaartDaoHibernate;
+import infra.hibernate.ProductDaoHibernate;
 import infra.hibernate.ReizigerDaoHibernate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -14,8 +17,6 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceException;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
@@ -37,10 +38,12 @@ public class Main {
             IReizigerDao rdao = new ReizigerDaoHibernate(entityManager);
             IAdresDao adao = new AdresDaoHibernate(entityManager);
             IOvChipkaartDao odao = new OvChipkaartDaoHibernate(entityManager);
+            IProductDao pdao = new ProductDaoHibernate(entityManager);
 
             testReizigerDAOHibernate(rdao, entityManager);
             testAdresDAO(adao, rdao, entityManager);
             testOVChipkaartDAO(odao, rdao, entityManager);
+            testProductDAO(pdao, odao, entityManager);
         } catch (PersistenceException e) {
             System.err.println("Hibernate kon de bewerking niet uitvoeren: " + e.getMessage());
         } catch (SQLException e) {
@@ -186,9 +189,8 @@ public class Main {
         // Reiziger 6 heeft nog geen kaart.
         Reiziger albrechts = rdao.findById(6);
         OvChipkaart nieuweKaart = new OvChipkaart(
-                99001, Date.valueOf("2027-01-31"), BigInteger.valueOf(2), new BigDecimal("15.00"));
-        nieuweKaart.setReiziger(albrechts);
-        albrechts.getOvChipkaart().add(nieuweKaart);
+                99001, Date.valueOf("2027-01-31"), 2, 15.00);
+        System.out.println("[Test] Reiziger.voegToeOVChipkaart() gaf " + albrechts.voegToeOVChipkaart(nieuweKaart) + " terug");
 
         System.out.print("[Test] Eerst " + kaarten.size() + " kaarten, na OVChipkaartDAO.save() ");
         boolean opgeslagen = inTransactie(em, () -> odao.save(nieuweKaart));
@@ -197,7 +199,7 @@ public class Main {
 
         System.out.println("[Test] OVChipkaartDAO.findById(99001) geeft: " + odao.findById(99001) + "\n");
 
-        nieuweKaart.setSaldo(new BigDecimal("42.50"));
+        nieuweKaart.setSaldo(42.50);
         boolean gewijzigd = inTransactie(em, () -> odao.update(nieuweKaart));
         System.out.println("[Test] Na OVChipkaartDAO.update() (gaf " + gewijzigd + " terug) geeft findById(99001): "
                 + odao.findById(99001) + "\n");
@@ -208,12 +210,54 @@ public class Main {
         }
         System.out.println();
 
+        System.out.println("[Test] Reiziger.verwijderOVChipkaart() gaf " + albrechts.verwijderOVChipkaart(nieuweKaart) + " terug");
         System.out.print("[Test] Eerst " + kaarten.size() + " kaarten, na OVChipkaartDAO.delete() ");
         boolean verwijderd = inTransactie(em, () -> {
-            albrechts.getOvChipkaart().remove(nieuweKaart);
-            return odao.delete(nieuweKaart);
+                        return odao.delete(nieuweKaart);
         });
         kaarten = odao.findAll();
         System.out.println(kaarten.size() + " kaarten (delete gaf " + verwijderd + " terug)\n");
+    }
+
+    /**
+     * P5H - Test de CRUD-operaties van ProductDAO, inclusief findByOvChipkaart().
+     */
+    private static void testProductDAO(IProductDao pdao, IOvChipkaartDao odao, EntityManager em)
+            throws SQLException {
+        System.out.println("\n---------- Test ProductDAO (Hibernate) -------------");
+
+        List<Product> producten = pdao.findAll();
+        System.out.println("[Test] ProductDAO.findAll() geeft de volgende producten:");
+        producten.forEach(System.out::println);
+        System.out.println();
+
+        // Een nieuw product, gekoppeld aan een bestaande kaart.
+        OvChipkaart kaart = odao.findById(35283);
+        Product nieuwProduct = new Product(101, "Weekendretour", "Onbeperkt reizen in het weekend", 29.95);
+
+        System.out.println("[Test] OVChipkaart.voegToeProduct() gaf " + kaart.voegToeProduct(nieuwProduct) + " terug");
+        System.out.print("[Test] Eerst " + producten.size() + " producten, na ProductDAO.save() ");
+        boolean opgeslagen = inTransactie(em, () -> pdao.save(nieuwProduct));
+        producten = pdao.findAll();
+        System.out.println(producten.size() + " producten (save gaf " + opgeslagen + " terug)\n");
+
+        System.out.println("[Test] ProductDAO.findById(101) geeft: " + pdao.findById(101) + "\n");
+
+        nieuwProduct.setPrijs(34.95);
+        boolean gewijzigd = inTransactie(em, () -> pdao.update(nieuwProduct));
+        System.out.println("[Test] ProductDAO.update() (gaf " + gewijzigd + " terug) geeft findById(101): "
+                + pdao.findById(101) + "\n");
+
+        System.out.println("[Test] ProductDAO.findByOvChipkaart(#35283) geeft:");
+        pdao.findByOvChipkaart(kaart).forEach(System.out::println);
+        System.out.println();
+
+        System.out.println("[Test] OVChipkaart.verwijderProduct() gaf " + kaart.verwijderProduct(nieuwProduct) + " terug");
+        System.out.print("[Test] Eerst " + producten.size() + " producten, na ProductDAO.delete() ");
+        boolean verwijderd = inTransactie(em, () -> {
+                        return pdao.delete(nieuwProduct);
+        });
+        producten = pdao.findAll();
+        System.out.println(producten.size() + " producten (delete gaf " + verwijderd + " terug)\n");
     }
 }

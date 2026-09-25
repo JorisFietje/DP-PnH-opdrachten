@@ -4,7 +4,6 @@ import domain.OvChipkaart;
 import domain.Product;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +42,8 @@ public class p5TestProduct {
     @Test
     void testOvPrijs() {
         Product product = new Product();
-        product.setPrijs(new BigDecimal(10));
+        product.setPrijs(10.0);
 
-        assertEquals(new BigDecimal(10), product.getPrijs());
+        assertEquals(10.0, product.getPrijs());
     }
 }

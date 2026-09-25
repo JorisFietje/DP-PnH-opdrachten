@@ -16,8 +16,6 @@ import util.ReizigerUtils;
 import util.SetupDatabase;
 
 import java.io.FileNotFoundException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -73,7 +71,7 @@ public class p5hTestReizigerDao {
         OvChipkaart ovChipkaart = OvChipkaartUtils.generateOvChipkaart(1);
         Product product = new Product();
         product.setBeschrijving("beschrijving");
-        product.setPrijs(new BigDecimal("20.00"));
+        product.setPrijs(20.00);
         product.setNaam("naam");
         ovChipkaarten.add(ovChipkaart);
         List<Product> producten = new ArrayList<>();
@@ -106,7 +104,7 @@ public class p5hTestReizigerDao {
         Product product = reiziger.getOvChipkaart().get(0).getProducten().get(0);
 
         product.setBeschrijving("beschrijving");
-        product.setPrijs(new BigDecimal("20.00"));
+        product.setPrijs(20.00);
         product.setNaam("naam");
 
         reizigerDao.update(reiziger);
@@ -123,8 +121,8 @@ public class p5hTestReizigerDao {
                 () -> assertEquals("naam", updatedProduct.getNaam()),
                 () -> assertEquals("beschrijving", updatedreiziger.getOvChipkaart().get(0).getProducten().get(0).getBeschrijving()),
                 () -> assertEquals("beschrijving", updatedProduct.getBeschrijving()),
-                () -> assertEquals(new BigDecimal("20.00"), updatedreiziger.getOvChipkaart().get(0).getProducten().get(0).getPrijs()),
-                () -> assertEquals(new BigDecimal("20.00"), updatedProduct.getPrijs())
+                () -> assertEquals(20.00, updatedreiziger.getOvChipkaart().get(0).getProducten().get(0).getPrijs()),
+                () -> assertEquals(20.00, updatedProduct.getPrijs())
         );
     }
 

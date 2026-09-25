@@ -4,9 +4,6 @@ import domain.Adres;
 import domain.OvChipkaart;
 import org.junit.jupiter.api.Assertions;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.sql.Date;
 import java.util.Random;
 
@@ -35,15 +32,12 @@ public class OvChipkaartUtils {
         return Date.valueOf(String.format("%d-%d-%d", randomYear, randomMonth, randomDay));
     }
 
-    private static BigDecimal getRandomSaldo() {
-        return new BigDecimal(random.nextInt(60) - 10).setScale(2, RoundingMode.CEILING);
+    private static double getRandomSaldo() {
+        return random.nextInt(60) - 10;
     }
 
-    private static BigInteger getRandomKlasse() {
-        if (random.nextBoolean()) {
-            return BigInteger.ONE;
-        }
-        return BigInteger.TWO;
+    private static int getRandomKlasse() {
+        return random.nextBoolean() ? 1 : 2;
     }
 
     public static void assertEquals(OvChipkaart expected, OvChipkaart actual) {

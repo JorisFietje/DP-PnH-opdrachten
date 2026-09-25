@@ -106,6 +106,46 @@ public class Reiziger {
     }
 
 
+
+    /**
+     * Koppelt een OV-chipkaart aan deze reiziger en zet de reiziger ook op de kaart,
+     * zodat beide kanten van de relatie kloppen.
+     *
+     * @return false als de kaart leeg is of al gekoppeld was
+     */
+    public boolean voegToeOVChipkaart(OvChipkaart kaart) {
+        if (kaart == null || ovChipkaart.contains(kaart)) {
+            return false;
+        }
+        kaart.setReiziger(this);
+        return ovChipkaart.add(kaart);
+    }
+
+    /**
+     * Maakt een OV-chipkaart los van deze reiziger, aan beide kanten.
+     *
+     * @return false als de kaart niet aan deze reiziger hing
+     */
+    public boolean verwijderOVChipkaart(OvChipkaart kaart) {
+        if (kaart == null || !ovChipkaart.remove(kaart)) {
+            return false;
+        }
+        kaart.setReiziger(null);
+        return true;
+    }
+
+    /** Korte weergave van de kaarten van deze reiziger, voor toString(). */
+    private String kaartenAlsTekst() {
+        if (ovChipkaart == null || ovChipkaart.isEmpty()) {
+            return "geen ov-chipkaarten";
+        }
+        StringBuilder sb = new StringBuilder(ovChipkaart.size() + " ov-chipkaarten: ");
+        for (int i = 0; i < ovChipkaart.size(); i++) {
+            sb.append(i > 0 ? ", " : "").append('#').append(ovChipkaart.get(i).getKaartNummer());
+        }
+        return sb.toString();
+    }
+
     public String getNaam() {
         if (tussenvoegsel == null || tussenvoegsel.isBlank()) {
             return voorletters + " " + achternaam;
@@ -115,7 +155,7 @@ public class Reiziger {
 
     @Override
     public String toString() {
-        return String.format("Reiziger {#%d %s, geb. %s, %s}",
-                reizigerId, getNaam(), geboortedatum, adres);
+        return String.format("Reiziger {#%d %s, geb. %s, %s, %s}",
+                reizigerId, getNaam(), geboortedatum, adres, kaartenAlsTekst());
     }
 }

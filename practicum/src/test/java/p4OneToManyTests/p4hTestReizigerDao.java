@@ -16,8 +16,6 @@ import util.ReizigerUtils;
 import util.SetupDatabase;
 
 import java.io.FileNotFoundException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Array;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -114,13 +112,13 @@ public class p4hTestReizigerDao {
         assertAll(
                 () -> assertEquals(68514, ovChipkaart.getKaartNummer()),
                 () -> assertEquals(Date.valueOf("2020-03-31"), ovChipkaart.getGeldigTot()),
-                () -> assertEquals(BigInteger.ONE, ovChipkaart.getKlasse()),
-                () -> assertEquals(new BigDecimal("2.50"), ovChipkaart.getSaldo())
+                () -> assertEquals(1, ovChipkaart.getKlasse()),
+                () -> assertEquals(2.50, ovChipkaart.getSaldo())
         );
 
-        ovChipkaart.setKlasse(BigInteger.TWO);
+        ovChipkaart.setKlasse(2);
         ovChipkaart.setGeldigTot(Date.valueOf("2021-01-01"));
-        ovChipkaart.setSaldo(new BigDecimal("-1.50"));
+        ovChipkaart.setSaldo(-1.50);
         reizigerDao.update(reiziger);
 
         OvChipkaart updatedOvChipkaart = ovChipkaartDao.findById(68514);
