@@ -106,6 +106,20 @@ public class Product {
         return true;
     }
 
+    /**
+     * Maakt dit product los van al zijn OV-chipkaarten, aan beide kanten. Nodig voordat
+     * een product verwijderd kan worden: de koppeltabel verwijst er anders nog naar.
+     *
+     * @return false als het product aan geen enkele kaart hing
+     */
+    public boolean verwijderAlleOVChipkaarten() {
+        boolean gewijzigd = false;
+        for (OvChipkaart ovChipkaart : new ArrayList<>(ovChipKaarten)) {
+            gewijzigd = verwijderOVChipkaart(ovChipkaart) || gewijzigd;
+        }
+        return gewijzigd;
+    }
+
     @Override
     public String toString() {
         return String.format(Locale.ROOT, "Product {#%d %s, %.2f, op %d kaart(en)}",

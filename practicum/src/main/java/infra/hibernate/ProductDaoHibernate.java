@@ -18,33 +18,19 @@ public class ProductDaoHibernate implements IProductDao {
 
     @Override
     public boolean save(Product product) {
-        for (OvChipkaart ovChipkaart : product.getOvChipKaarten()) {
-            if (!ovChipkaart.getProducten().contains(product)) {
-                ovChipkaart.getProducten().add(product);
-            }
-        }
         entityManager.persist(product);
         return true;
     }
 
     @Override
     public boolean update(Product product) {
-        for (OvChipkaart ovChipkaart : product.getOvChipKaarten()) {
-            if (!ovChipkaart.getProducten().contains(product)) {
-                ovChipkaart.getProducten().add(product);
-            }
-        }
         entityManager.merge(product);
         return true;
     }
 
     @Override
     public boolean delete(Product product) {
-        for (OvChipkaart ovChipkaart : product.getOvChipKaarten()) {
-            ovChipkaart.getProducten().remove(product);
-        }
-        product.getOvChipKaarten().clear();
-
+        product.verwijderAlleOVChipkaarten();
         entityManager.remove(product);
         return true;
     }
